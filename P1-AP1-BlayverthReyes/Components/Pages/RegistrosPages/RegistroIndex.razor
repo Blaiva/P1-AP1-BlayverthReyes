@@ -1,0 +1,26 @@
+﻿@page "/registros/index"
+
+@inject RegistrosService registrosService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Registro</PageTitle>
+<div class="container">
+	<div class="card shadow-lg">
+		<div class="card-header text-center">
+			<h5 class="card-title">Registro</h5>
+		</div>
+	</div>
+</div>
+
+@code {
+	public List<Registros> ListaRegistros { get; set; } = new List<Registros>();
+
+	public string Filtro { get; set; } = string.Empty;
+	public string ValorFiltro { get; set; } = string.Empty;
+
+	protected override async Task OnInitializedAsync()
+	{
+		ListaRegistros = await registrosService.Listar(criterio:j=>j.RegistroId > 0);
+	}
+}

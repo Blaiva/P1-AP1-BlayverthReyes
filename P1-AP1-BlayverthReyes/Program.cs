@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using P1_AP1_BlayverthReyes.Components;
 using P1_AP1_BlayverthReyes.DAL;
+using P1_AP1_BlayverthReyes.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,8 @@ builder.Services.AddRazorComponents()
 
 var ConStr = builder.Configuration.GetConnectionString("ConStr");
 builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlite(ConStr));
+
+builder.Services.AddScoped<RegistrosService>();
 
 var app = builder.Build();
 
