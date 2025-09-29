@@ -10,6 +10,6 @@ public class RegistrosService(IDbContextFactory<Contexto> DbFactory)
     public async Task<List<EntradasHuacales>> Listar(Expression<Func<EntradasHuacales, bool>> criterio)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        return await contexto.Registros.Where(criterio).AsNoTracking().ToListAsync();
+        return await contexto.EntradasHuacales.Where(criterio).AsNoTracking().ToListAsync();
     }
 }
