@@ -1,0 +1,121 @@
+﻿@page "/"
+
+@inject EntradasHuacalesService entradasHuacalesService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Entrada de Huacales</PageTitle>
+<div class="container">
+	<div class="card shadow-lg">
+		<div class="card-header text-center">
+			<h5 class="card-title">Entrada de Huacales</h5>
+		</div>
+
+		<div class="card-body">
+
+			<div class="row">
+				<div class="col-3">
+					<label class="col-form-label"><strong>Filtar por</strong></label>
+				</div>
+
+				<div class="col-4">
+					<label class="col-form-label"><strong>Buscar</strong></label>
+				</div>
+			</div>
+
+			<div class="row align-items-center">
+				<div class="col-3">
+					<InputSelect class="form-select" @bind-value="Filtro">
+						<option value="" selected disabled>Elige una opci&oacute;n</option>
+						<option value="Fecha">Fecha</option>
+						<option value="Cliente">Cliente</option>
+						<option value="Cantidad">Cantidad</option>
+						<option value="Precio">Precio</option>
+					</InputSelect>
+				</div>
+
+				<div class="col-4">
+					<div class="input-group">
+						<input class="form-control" @bind="ValorFiltro" placeholder="Buscar" />
+						<button type="button" class="btn btn-outline-primary" @onclick="Buscar"><span class="bi bi-search"/></button>
+						<button type="reset" class="btn btn-outline-secondary" @onclick="Restablecer"><span class="bi bi-arrow-counterclockwise" /></button>
+					</div>
+				</div>
+
+				<div class="col-5">
+					<a href="/create" class="btn btn-primary"><span class="bi bi-plus-square"/> Crear</a>
+				</div>
+			</div>
+
+			<table class="table table-hover">
+				<thead class="table table-striped text-black">
+					<tr>
+						<th>IdEntrada</th>
+						<th>Cliente</th>
+						<th>Fecha</th>
+						<th>Cantidad</th>
+						<th>Precio</th>
+						<th>Opciones</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach(var entrada in ListaEntradas)
+					{
+						<tr>
+							<td>@entrada.IdEntrada</td>
+							<td>@entrada.NombreCliente</td>
+							<td>@entrada.Fecha.ToString("dd/MM/yyyy")</td>
+							<td>@entrada.Cantidad</td>
+							<td>@entrada.Precio</td>
+
+							<td>
+								<a href="/edit/@entrada.IdEntrada" class="btn btn-outline-primary"><span class="bi bi-pencil"/></a>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+
+		<div class="card-footer">
+			<label class="col-1"><strong>Cantidad: </strong>@ListaEntradas.Count</label>
+			<label><strong>Total: </strong>@ListaEntradas.Sum(e => e.Cantidad * e.Precio)</label>
+		</div>
+	</div>
+</div>
+
+@code {
+	public List<EntradasHuacales> ListaEntradas { get; set; } = new List<EntradasHuacales>();
+
+	public string Filtro { get; set; } = string.Empty;
+	public string ValorFiltro { get; set; } = string.Empty;
+
+	protected override async Task OnInitializedAsync()
+	{
+		ListaEntradas = await entradasHuacalesService.Listar(criterio:j=>j.IdEntrada > 0);
+	}
+
+	public async Task Buscar()
+	{
+		if(ValorFiltro.Trim() != "")
+		{
+			if (Filtro == "Fecha")
+				ListaEntradas = await entradasHuacalesService.Listar(e => e.Fecha.ToString("dd/MM/yyyy").Equals(ValorFiltro.Trim()));
+			else if (Filtro == "Cliente")
+				ListaEntradas = await entradasHuacalesService.Listar(e => e.NombreCliente.ToLower().Contains(ValorFiltro.Trim().ToLower()));
+			else if (Filtro == "Cantidad")
+				ListaEntradas = await entradasHuacalesService.Listar(e => e.Cantidad.ToString().Contains(ValorFiltro.Trim()));
+			else if (Filtro == "Precio")
+				ListaEntradas = await entradasHuacalesService.Listar(e => e.Precio.ToString().Contains(ValorFiltro.Trim()));
+		}
+		else
+			ListaEntradas = await entradasHuacalesService.Listar(criterio: j => j.IdEntrada > 0);
+	}
+
+	public async Task Restablecer()
+	{
+		ListaEntradas = await entradasHuacalesService.Listar(criterio: j => j.IdEntrada > 0);
+		ValorFiltro = string.Empty;
+		Filtro = string.Empty;
+	}
+}

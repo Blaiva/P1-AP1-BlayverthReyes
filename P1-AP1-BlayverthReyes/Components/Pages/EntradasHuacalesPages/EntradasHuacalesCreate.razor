@@ -1,0 +1,16 @@
+﻿@page "/create"
+
+@inject EntradasHuacalesService entradasHuacalesService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+@code {
+	public EntradasHuacales EntradasHuacales { get; set; } = new EntradasHuacales();
+
+	public async Task Guardar()
+	{
+		var creado = await entradasHuacalesService.Guardar(EntradasHuacales);
+		if (creado)
+			navigationManager.NavigateTo("/");
+	}
+}
