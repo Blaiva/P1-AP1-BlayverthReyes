@@ -21,6 +21,6 @@
 
 	protected override async Task OnInitializedAsync()
 	{
-		ListaRegistros = await registrosService.Listar(criterio:j=>j.RegistroId > 0);
+		ListaRegistros = await registrosService.Listar(criterio:j=>j.IdEntrada > 0);
 	}
 }
