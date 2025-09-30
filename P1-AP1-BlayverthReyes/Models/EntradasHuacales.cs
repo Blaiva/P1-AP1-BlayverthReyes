@@ -19,6 +19,6 @@ public class EntradasHuacales
     public int Cantidad { get; set; }
 
     [Required(ErrorMessage = "El precio de los huacales es requerido")]
-    [Range(0, int.MaxValue, ErrorMessage = "El precio de los huacales debe ser negativo")]
+    [Range(0, int.MaxValue, ErrorMessage = "El precio de los huacales debe ser mayor que cero")]
     public double Precio { get; set; }
 }
