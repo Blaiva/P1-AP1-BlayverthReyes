@@ -7,12 +7,15 @@
 <PageTitle>Entrada de Huacales</PageTitle>
 <div class="container">
 	<div class="card shadow-lg">
+		@*Header*@
 		<div class="card-header text-center">
 			<h5 class="card-title">Entrada de Huacales</h5>
 		</div>
 
+		@*Body*@
 		<div class="card-body">
 
+			@*Labels*@
 			<div class="row">
 				<div class="col-3">
 					<label class="col-form-label"><strong>Filtar por</strong></label>
@@ -23,11 +26,11 @@
 				</div>
 			</div>
 
+			@*Inputs y buttons*@
 			<div class="row align-items-center">
 				<div class="col-3">
 					<InputSelect class="form-select" @bind-value="Filtro">
 						<option value="" selected disabled>Elige una opci&oacute;n</option>
-						<option value="Fecha">Fecha</option>
 						<option value="Cliente">Cliente</option>
 						<option value="Cantidad">Cantidad</option>
 						<option value="Precio">Precio</option>
@@ -47,7 +50,9 @@
 				</div>
 			</div>
 
+			@*Tabla*@
 			<table class="table table-hover">
+				@*Encabezados de la tabla*@
 				<thead class="table table-striped text-black">
 					<tr>
 						<th>IdEntrada</th>
@@ -58,6 +63,7 @@
 						<th>Opciones</th>
 					</tr>
 				</thead>
+				@*Datos de la tabla*@
 				<tbody>
 					@foreach(var entrada in ListaEntradas)
 					{
@@ -77,6 +83,7 @@
 			</table>
 		</div>
 
+		@*Footer*@
 		<div class="card-footer">
 			<label class="col-1"><strong>Cantidad: </strong>@ListaEntradas.Count</label>
 			<label><strong>Total: </strong>@ListaEntradas.Sum(e => e.Cantidad * e.Precio)</label>
@@ -99,9 +106,7 @@
 	{
 		if(ValorFiltro.Trim() != "")
 		{
-			if (Filtro == "Fecha")
-				ListaEntradas = await entradasHuacalesService.Listar(e => e.Fecha.ToString("dd/MM/yyyy").Equals(ValorFiltro.Trim()));
-			else if (Filtro == "Cliente")
+			if (Filtro == "Cliente")
 				ListaEntradas = await entradasHuacalesService.Listar(e => e.NombreCliente.ToLower().Contains(ValorFiltro.Trim().ToLower()));
 			else if (Filtro == "Cantidad")
 				ListaEntradas = await entradasHuacalesService.Listar(e => e.Cantidad.ToString().Contains(ValorFiltro.Trim()));
