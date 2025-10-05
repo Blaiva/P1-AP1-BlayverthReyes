@@ -53,16 +53,46 @@
 				<div class="btn-group">
 					<a href="/" class="btn btn-outline-secondary"><span class="bi bi-arrow-bar-left" /> Volver</a>
 					<button type="submit" class="btn btn-outline-success"><span class="bi bi-check-circle" /> Guardar</button>
-					<button type="button" class="btn btn-outline-danger" @onclick="Eliminar"><span class="bi bi-trash-fill"/> Eliminar</button>
+					<button type="button" class="btn btn-outline-danger" @onclick="MostrarModal"><span class="bi bi-trash-fill"/> Eliminar</button>
 				</div>
 			</div>
 		</div>
 	</div>
 </EditForm>
 
+@if (Eliminando)
+{
+	<div class="modal show" tabindex="-1" style="display: block;" aria-labelledby="confirmDeleteModalLabel" aria-hidden="false">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header text-center">
+					<h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminacion</h5>
+					<button type="button" class="btn-close" aria-label="Close" @onclick="CerrarModal"></button>
+				</div>
+				<div class="modal-body">
+					<p>¿Estas seguro?</p>
+					<p><strong>EntradaId:</strong> @EntradaHuacal.IdEntrada</p>
+					<p><strong>Nombre:</strong> @EntradaHuacal.NombreCliente</p>
+					<p><strong>Cantidad:</strong> @EntradaHuacal.Cantidad</p>
+					<p><strong>Precio:</strong> @EntradaHuacal.Precio</p>
+					<p><strong>Fecha:</strong> @EntradaHuacal.Fecha.ToString("dd/MM/yyyy")</p>
+				</div>
+				<div class="modal-footer">
+					<div class="btn-group">
+						<button type="button" class="btn btn-outline-secondary" @onclick="CerrarModal"><span class="bi bi-arrow-bar-left" /> Volver</button>
+						<button type="button" class="btn btn-outline-danger" @onclick="Eliminar"><span class="bi bi-trash-fill" /> Eliminar</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
 @code {
 	[Parameter]
 	public int idEntrada { get; set; }
+
+	public bool Eliminando { get; set; }
 
 	public EntradasHuacales EntradaHuacal { get; set; } = new EntradasHuacales();
 
@@ -83,5 +113,15 @@
 		var eliminado = await entradasHuacalesService.Eliminar(idEntrada);
 		if (eliminado)
 			navigationManager.NavigateTo("/");
+	}
+
+	private void MostrarModal()
+	{
+		Eliminando = true;
+	}
+
+	private void CerrarModal()
+	{
+		Eliminando = false;
 	}
 }
