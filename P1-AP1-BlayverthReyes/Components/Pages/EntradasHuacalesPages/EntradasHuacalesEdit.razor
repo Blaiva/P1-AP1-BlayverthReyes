@@ -37,23 +37,38 @@
 
 				<div class="mb-3">
 					<label class="form-label"><strong>Cantidad</strong></label>
-					<InputNumber class="form-control" @bind-Value="EntradaHuacal.Cantidad" />
+					<InputNumber class="form-control" @bind-Value="EntradaHuacal.Cantidad" @oninput="Actualizar"/>
 					<ValidationMessage For="@(() => EntradaHuacal.Cantidad)" />
 				</div>
 
 				<div class="mb-3">
 					<label class="form-label"><strong>Precio</strong></label>
-					<InputNumber class="form-control" @bind-Value="EntradaHuacal.Precio" />
+					<InputNumber class="form-control" @bind-Value="EntradaHuacal.Precio" @oninput="Actualizar"/>
 					<ValidationMessage For="@(() => EntradaHuacal.Precio)" />
 				</div>
+
+				<div class="mb-3">
+					<label class="form-label"><strong>Importe</strong></label>
+					<input type="number" class="form-control" value="@(EntradaHuacal.Cantidad*EntradaHuacal.Precio)" readonly/>
+				</div>
+
+				@if (!string.IsNullOrEmpty(AlertMessage))
+				{
+					<div class="alert alert-@AlertType alert-dismissible fade show" role="alert">
+						<div>@AlertMessage</div>
+					</div>
+				}
 			</div>
 
 			@*Footer*@
 			<div class="card-footer text-center">
 				<div class="btn-group">
 					<a href="/" class="btn btn-outline-secondary"><span class="bi bi-arrow-bar-left" /> Volver</a>
-					<button type="submit" class="btn btn-outline-success"><span class="bi bi-check-circle" /> Guardar</button>
-					<button type="button" class="btn btn-outline-danger" @onclick="MostrarModal"><span class="bi bi-trash-fill"/> Eliminar</button>
+					@if(AlertType != "success")
+					{
+						<button type="submit" class="btn btn-outline-success"><span class="bi bi-check-circle" /> Guardar</button>
+						<button type="button" class="btn btn-outline-danger" @onclick="MostrarModal"><span class="bi bi-trash-fill"/> Eliminar</button>
+					}
 				</div>
 			</div>
 		</div>
@@ -92,36 +107,70 @@
 	[Parameter]
 	public int idEntrada { get; set; }
 
-	public bool Eliminando { get; set; }
-
 	public EntradasHuacales EntradaHuacal { get; set; } = new EntradasHuacales();
+	public bool Eliminando { get; set; }
+	public string AlertMessage { get; set; }
+	public string AlertType { get; set; }
+	public double Importe { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
 		EntradaHuacal = await entradasHuacalesService.Buscar(idEntrada);
+		Importe = EntradaHuacal.Cantidad * EntradaHuacal.Precio;
 	}
 
 	public async Task Modificar()
 	{
 		var modificado = await entradasHuacalesService.Guardar(EntradaHuacal);
 		if (modificado)
-			navigationManager.NavigateTo("/");
+		{
+			AlertMessage = "Jugador modificado correctamente.";
+			AlertType = "success";
+		}
+		else
+		{
+			AlertMessage = "Error al modificar el jugador.";
+			AlertType = "danger";
+		}
 	}
 
 	public async Task Eliminar()
 	{
-		var eliminado = await entradasHuacalesService.Eliminar(idEntrada);
-		if (eliminado)
-			navigationManager.NavigateTo("/");
+		try
+		{
+			var eliminado = await entradasHuacalesService.Eliminar(idEntrada);
+			if (eliminado)
+			{
+				AlertMessage = "Jugador eliminado correctamente.";
+				AlertType = "success";
+			}
+			else
+			{
+				AlertMessage = "Error al eliminar el jugador.";
+				AlertType = "danger";
+			}
+
+		}
+		catch (Exception e)
+		{
+			AlertMessage = "No se puede eliminar, el jugador tiene partidas registradas";
+			AlertType = "danger";
+		}
+		CerrarModal();
 	}
 
-	private void MostrarModal()
+	public void MostrarModal()
 	{
 		Eliminando = true;
 	}
 
-	private void CerrarModal()
+	public void CerrarModal()
 	{
 		Eliminando = false;
+	}
+
+	public void Actualizar()
+	{
+		StateHasChanged();
 	}
 }
