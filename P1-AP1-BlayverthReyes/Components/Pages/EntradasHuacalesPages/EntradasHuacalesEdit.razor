@@ -122,36 +122,27 @@
 		var modificado = await entradasHuacalesService.Guardar(EntradaHuacal);
 		if (modificado)
 		{
-			AlertMessage = "Jugador modificado correctamente.";
+			AlertMessage = "Entrada modificada correctamente.";
 			AlertType = "success";
 		}
 		else
 		{
-			AlertMessage = "Error al modificar el jugador.";
+			AlertMessage = "Error al modificar la Entrada.";
 			AlertType = "danger";
 		}
 	}
 
 	public async Task Eliminar()
 	{
-		try
+		var eliminado = await entradasHuacalesService.Eliminar(idEntrada);
+		if (eliminado)
 		{
-			var eliminado = await entradasHuacalesService.Eliminar(idEntrada);
-			if (eliminado)
-			{
-				AlertMessage = "Jugador eliminado correctamente.";
-				AlertType = "success";
-			}
-			else
-			{
-				AlertMessage = "Error al eliminar el jugador.";
-				AlertType = "danger";
-			}
-
+			AlertMessage = "Entrada eliminada correctamente.";
+			AlertType = "success";
 		}
-		catch (Exception e)
+		else
 		{
-			AlertMessage = "No se puede eliminar, el jugador tiene partidas registradas";
+			AlertMessage = "Error al eliminar la Entrada.";
 			AlertType = "danger";
 		}
 		MostrarModal();
