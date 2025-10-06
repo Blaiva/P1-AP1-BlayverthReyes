@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/index"
 
 @inject EntradasHuacalesService entradasHuacalesService
 @inject NavigationManager navigationManager
@@ -14,6 +14,28 @@
 
 		@*Body*@
 		<div class="card-body">
+
+			@*Labels*@
+			<div class="row">
+				<div class="col-2">
+					<label class="col-form-label"><strong>Desde</strong></label>
+				</div>
+
+				<div class="col-3">
+					<label class="col-form-label"><strong>Hasta</strong></label>
+				</div>
+			</div>
+
+			@*Inputs*@
+			<div class="row">
+				<div class="col-2">
+					<InputDate class="form-control" @bind-Value="FechaDesde"/>
+				</div>
+
+				<div class="col-3">
+					<InputDate class="form-control w-75" @bind-Value="FechaHasta"/>
+				</div>
+			</div>
 
 			@*Labels*@
 			<div class="row">
@@ -56,10 +78,11 @@
 				<thead class="table table-striped text-black">
 					<tr>
 						<th>IdEntrada</th>
-						<th>Cliente</th>
 						<th>Fecha</th>
+						<th>Cliente</th>
 						<th>Cantidad</th>
 						<th>Precio</th>
+						<th>Importe</th>
 						<th>Opciones</th>
 					</tr>
 				</thead>
@@ -69,10 +92,11 @@
 					{
 						<tr>
 							<td>@entrada.IdEntrada</td>
-							<td>@entrada.NombreCliente</td>
 							<td>@entrada.Fecha.ToString("dd/MM/yyyy")</td>
+							<td>@entrada.NombreCliente</td>
 							<td>@entrada.Cantidad</td>
-							<td>@entrada.Precio</td>
+							<td>RD$@Math.Round(entrada.Precio, 2)</td>
+							<td>RD$@Math.Round(entrada.Precio*entrada.Cantidad, 2)</td>
 
 							<td>
 								<a href="/edit/@entrada.IdEntrada" class="btn btn-outline-primary"><span class="bi bi-pencil"/></a>
@@ -85,8 +109,10 @@
 
 		@*Footer*@
 		<div class="card-footer">
-			<label class="col-1"><strong>Cantidad: </strong>@ListaEntradas.Count</label>
-			<label><strong>Total: </strong>@ListaEntradas.Sum(e => e.Cantidad * e.Precio)</label>
+			<div class="text-end">
+				<label class="px-2"><strong>Cantidad: </strong>@ListaEntradas.Sum(e => e.Cantidad)</label>
+				<label><strong>Total: </strong>RD$@Math.Round(ListaEntradas.Sum(e => e.Cantidad * e.Precio), 2)</label>
+			</div>
 		</div>
 	</div>
 </div>
@@ -96,15 +122,17 @@
 
 	public string Filtro { get; set; } = string.Empty;
 	public string ValorFiltro { get; set; } = string.Empty;
+	public DateTime? FechaDesde { get; set; } = null;
+	public DateTime? FechaHasta { get; set; } = null;
 
 	protected override async Task OnInitializedAsync()
 	{
-		ListaEntradas = await entradasHuacalesService.Listar(criterio:j=>j.IdEntrada > 0);
+		ListaEntradas = await entradasHuacalesService.Listar(e=>e.IdEntrada > 0);
 	}
 
 	public async Task Buscar()
 	{
-		if(ValorFiltro.Trim() != "")
+		if(ValorFiltro.Trim() != "" || (FechaDesde.HasValue || FechaHasta.HasValue))
 		{
 			if (Filtro == "Cliente")
 				ListaEntradas = await entradasHuacalesService.Listar(e => e.NombreCliente.ToLower().Contains(ValorFiltro.Trim().ToLower()));
@@ -112,15 +140,24 @@
 				ListaEntradas = await entradasHuacalesService.Listar(e => e.Cantidad.ToString().Contains(ValorFiltro.Trim()));
 			else if (Filtro == "Precio")
 				ListaEntradas = await entradasHuacalesService.Listar(e => e.Precio.ToString().Contains(ValorFiltro.Trim()));
+
+			if(FechaDesde.HasValue && FechaHasta.HasValue)
+				ListaEntradas = ListaEntradas.Where(e => e.Fecha >= FechaDesde && e.Fecha <= FechaHasta).ToList();
+			else if (FechaDesde.HasValue)
+				ListaEntradas = ListaEntradas.Where(e => e.Fecha >= FechaDesde).ToList();
+			else if (FechaHasta.HasValue)
+				ListaEntradas = ListaEntradas.Where(e => e.Fecha <= FechaHasta).ToList();
 		}
 		else
-			ListaEntradas = await entradasHuacalesService.Listar(criterio: j => j.IdEntrada > 0);
+			ListaEntradas = await entradasHuacalesService.Listar(e => e.IdEntrada > 0);
 	}
 
 	public async Task Restablecer()
 	{
-		ListaEntradas = await entradasHuacalesService.Listar(criterio: j => j.IdEntrada > 0);
+		ListaEntradas = await entradasHuacalesService.Listar(e => e.IdEntrada > 0);
 		ValorFiltro = string.Empty;
 		Filtro = string.Empty;
+		FechaDesde = null;
+		FechaHasta = null;
 	}
 }

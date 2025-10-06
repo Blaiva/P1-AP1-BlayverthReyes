@@ -19,20 +19,15 @@
 			@*Body*@
 			<div class="card-body">
 				<div class="mb-3">
-					<label class="form-label"><strong>IdEntrada</strong></label>
-					<InputNumber class="form-control" @bind-Value="EntradaHuacal.IdEntrada" readonly/>
+					<label class="form-label"><strong>Fecha</strong></label>
+					<InputDate class="form-control" @bind-Value="EntradaHuacal.Fecha" />
+					<ValidationMessage For="@(() => EntradaHuacal.Fecha)" />
 				</div>
 
 				<div class="mb-3">
 					<label class="form-label"><strong>Nombre del Cliente</strong></label>
 					<InputText class="form-control" @bind-Value="EntradaHuacal.NombreCliente" />
 					<ValidationMessage For="@(() => EntradaHuacal.NombreCliente)" />
-				</div>
-
-				<div class="mb-3">
-					<label class="form-label"><strong>Fecha</strong></label>
-					<InputDate class="form-control" @bind-Value="EntradaHuacal.Fecha" />
-					<ValidationMessage For="@(() => EntradaHuacal.Fecha)" />
 				</div>
 
 				<div class="mb-3">
@@ -46,13 +41,28 @@
 					<InputNumber class="form-control" @bind-Value="EntradaHuacal.Precio" />
 					<ValidationMessage For="@(() => EntradaHuacal.Precio)" />
 				</div>
+
+				<div class="mb-3">
+					<label class="form-label"><strong>Importe</strong></label>
+					<input type="number" class="form-control" value="@(EntradaHuacal.Cantidad* EntradaHuacal.Precio)" readonly />
+				</div>
+
+				@if (!string.IsNullOrEmpty(AlertMessage))
+				{
+					<div class="alert alert-@AlertType alert-dismissible fade show" role="alert">
+						<div>@AlertMessage</div>
+					</div>
+				}
 			</div>
 
 			@*Footer*@
 			<div class="card-footer text-center">
 				<div class="btn-group">
-					<a href="/" class="btn btn-outline-secondary"><span class="bi bi-arrow-bar-left"/> Volver</a>
-					<button type="submit" class="btn btn-outline-success"><span class="bi bi-check-circle"/> Guardar</button>
+					<a href="/index" class="btn btn-outline-secondary"><span class="bi bi-arrow-bar-left"/> Volver</a>
+					@if(AlertType != "success")
+					{
+						<button type="submit" class="btn btn-outline-success"><span class="bi bi-check-circle" /> Guardar</button>
+					}
 				</div>
 			</div>
 		</div>
@@ -61,11 +71,26 @@
 
 @code {
 	public EntradasHuacales EntradaHuacal { get; set; } = new EntradasHuacales();
+	public string AlertMessage { get; set; }
+	public string AlertType { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		EntradaHuacal.Fecha = DateTime.Now;
+	}
 
 	public async Task Guardar()
 	{
 		var creado = await entradasHuacalesService.Guardar(EntradaHuacal);
 		if (creado)
-			navigationManager.NavigateTo("/");
+		{
+			AlertMessage = "Entrada creada correctamente.";
+			AlertType = "success";
+		}
+		else
+		{
+			AlertMessage = "Error al crear la Entrada.";
+			AlertType = "danger";
+		}
 	}
 }

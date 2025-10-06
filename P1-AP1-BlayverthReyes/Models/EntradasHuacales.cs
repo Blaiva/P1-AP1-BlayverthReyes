@@ -15,10 +15,10 @@ public class EntradasHuacales
     public string NombreCliente { get; set; }
 
     [Required(ErrorMessage = "La cantidad de huacales es requerida")]
-    [Range(0, int.MaxValue, ErrorMessage = "La cantidad de huacales debe ser mayor que cero")]
+    [Range(1, int.MaxValue, ErrorMessage = "La cantidad de huacales debe ser mayor que cero")]
     public int Cantidad { get; set; }
 
     [Required(ErrorMessage = "El precio de los huacales es requerido")]
-    [Range(0, int.MaxValue, ErrorMessage = "El precio de los huacales debe ser mayor que cero")]
+    [Range(0.01, int.MaxValue, ErrorMessage = "El precio de los huacales debe ser mayor que cero")]
     public double Precio { get; set; }
 }
