@@ -24,15 +24,15 @@
 				</div>
 
 				<div class="mb-3">
-					<label class="form-label"><strong>Nombre del Cliente</strong></label>
-					<InputText class="form-control" @bind-Value="EntradaHuacal.NombreCliente" />
-					<ValidationMessage For="@(() => EntradaHuacal.NombreCliente)" />
-				</div>
-
-				<div class="mb-3">
 					<label class="form-label"><strong>Fecha</strong></label>
 					<InputDate class="form-control" @bind-Value="EntradaHuacal.Fecha" />
 					<ValidationMessage For="@(() => EntradaHuacal.Fecha)" />
+				</div>
+
+				<div class="mb-3">
+					<label class="form-label"><strong>Nombre del Cliente</strong></label>
+					<InputText class="form-control" @bind-Value="EntradaHuacal.NombreCliente" />
+					<ValidationMessage For="@(() => EntradaHuacal.NombreCliente)" />
 				</div>
 
 				<div class="mb-3">
@@ -82,7 +82,7 @@
 			<div class="modal-content">
 				<div class="modal-header text-center">
 					<h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminacion</h5>
-					<button type="button" class="btn-close" aria-label="Close" @onclick="CerrarModal"></button>
+					<button type="button" class="btn-close" aria-label="Close" @onclick="MostrarModal"></button>
 				</div>
 				<div class="modal-body">
 					<p>¿Estas seguro?</p>
@@ -94,7 +94,7 @@
 				</div>
 				<div class="modal-footer">
 					<div class="btn-group">
-						<button type="button" class="btn btn-outline-secondary" @onclick="CerrarModal"><span class="bi bi-arrow-bar-left" /> Volver</button>
+						<button type="button" class="btn btn-outline-secondary" @onclick="MostrarModal"><span class="bi bi-arrow-bar-left" /> Volver</button>
 						<button type="button" class="btn btn-outline-danger" @onclick="Eliminar"><span class="bi bi-trash-fill" /> Eliminar</button>
 					</div>
 				</div>
@@ -108,15 +108,13 @@
 	public int idEntrada { get; set; }
 
 	public EntradasHuacales EntradaHuacal { get; set; } = new EntradasHuacales();
-	public bool Eliminando { get; set; }
+	public bool Eliminando { get; set; } = false;
 	public string AlertMessage { get; set; }
 	public string AlertType { get; set; }
-	public double Importe { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
 		EntradaHuacal = await entradasHuacalesService.Buscar(idEntrada);
-		Importe = EntradaHuacal.Cantidad * EntradaHuacal.Precio;
 	}
 
 	public async Task Modificar()
@@ -156,16 +154,11 @@
 			AlertMessage = "No se puede eliminar, el jugador tiene partidas registradas";
 			AlertType = "danger";
 		}
-		CerrarModal();
+		MostrarModal();
 	}
 
 	public void MostrarModal()
 	{
-		Eliminando = true;
-	}
-
-	public void CerrarModal()
-	{
-		Eliminando = false;
+		Eliminando = !Eliminando;
 	}
 }
