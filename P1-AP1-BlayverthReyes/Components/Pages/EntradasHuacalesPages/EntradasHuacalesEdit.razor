@@ -37,13 +37,13 @@
 
 				<div class="mb-3">
 					<label class="form-label"><strong>Cantidad</strong></label>
-					<InputNumber class="form-control" @bind-Value="EntradaHuacal.Cantidad" @oninput="Actualizar"/>
+					<InputNumber class="form-control" @bind-Value="EntradaHuacal.Cantidad"/>
 					<ValidationMessage For="@(() => EntradaHuacal.Cantidad)" />
 				</div>
 
 				<div class="mb-3">
 					<label class="form-label"><strong>Precio</strong></label>
-					<InputNumber class="form-control" @bind-Value="EntradaHuacal.Precio" @oninput="Actualizar"/>
+					<InputNumber class="form-control" @bind-Value="EntradaHuacal.Precio"/>
 					<ValidationMessage For="@(() => EntradaHuacal.Precio)" />
 				</div>
 
@@ -167,10 +167,5 @@
 	public void CerrarModal()
 	{
 		Eliminando = false;
-	}
-
-	public void Actualizar()
-	{
-		StateHasChanged();
 	}
 }
