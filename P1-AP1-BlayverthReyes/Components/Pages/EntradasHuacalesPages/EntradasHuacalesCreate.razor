@@ -2,9 +2,12 @@
 
 @inject EntradasHuacalesService entradasHuacalesService
 @inject NavigationManager navigationManager
+@inject ToastService toastService
 @rendermode InteractiveServer
 
 <PageTitle>Registrar Entrada</PageTitle>
+
+<Toasts class="p-3" AutoHide="true" Delay="5000" Placement="ToastsPlacement.TopRight" />
 
 <EditForm Model="EntradaHuacal" OnValidSubmit="Guardar">
 	<DataAnnotationsValidator/>
@@ -46,20 +49,13 @@
 					<label class="form-label"><strong>Importe</strong></label>
 					<input type="number" class="form-control" value="@(EntradaHuacal.Cantidad* EntradaHuacal.Precio)" readonly />
 				</div>
-
-				@if (!string.IsNullOrEmpty(AlertMessage))
-				{
-					<div class="alert alert-@AlertType alert-dismissible fade show" role="alert">
-						<div>@AlertMessage</div>
-					</div>
-				}
 			</div>
 
 			@*Footer*@
 			<div class="card-footer text-center">
 				<div class="btn-group">
 					<a href="/index" class="btn btn-outline-secondary"><span class="bi bi-arrow-bar-left"/> Volver</a>
-					@if(AlertType != "success")
+					@if(!creado)
 					{
 						<button type="submit" class="btn btn-outline-success"><span class="bi bi-check-circle" /> Guardar</button>
 					}
@@ -71,8 +67,7 @@
 
 @code {
 	public EntradasHuacales EntradaHuacal { get; set; } = new EntradasHuacales();
-	public string AlertMessage { get; set; }
-	public string AlertType { get; set; }
+	public bool creado { get; set; } = false;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -81,16 +76,14 @@
 
 	public async Task Guardar()
 	{
-		var creado = await entradasHuacalesService.Guardar(EntradaHuacal);
+		creado = await entradasHuacalesService.Guardar(EntradaHuacal);
 		if (creado)
 		{
-			AlertMessage = "Entrada creada correctamente.";
-			AlertType = "success";
+			toastService.ShowSuccess("Entrada registrada correctamente");
 		}
 		else
 		{
-			AlertMessage = "Error al crear la Entrada.";
-			AlertType = "danger";
+			toastService.ShowError("No se pudo registrar la entrada");
 		}
 	}
 }
