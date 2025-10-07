@@ -46,13 +46,13 @@
 
 				<div class="mb-3">
 					<label class="form-label"><strong>Precio</strong></label>
-					<InputNumber class="form-control" @bind-Value="EntradaHuacal.Precio"/>
-					<ValidationMessage For="@(() => EntradaHuacal.Precio)" />
+					<InputNumber class="form-control" @bind-Value="EntradaHuacal.Importe"/>
+					<ValidationMessage For="@(() => EntradaHuacal.Importe)" />
 				</div>
 
 				<div class="mb-3">
 					<label class="form-label"><strong>Importe</strong></label>
-					<input type="number" class="form-control" value="@(EntradaHuacal.Cantidad*EntradaHuacal.Precio)" readonly/>
+					<input type="number" class="form-control" value="@(EntradaHuacal.Cantidad*EntradaHuacal.Importe)" readonly/>
 				</div>
 
 			</div>
@@ -86,7 +86,7 @@
 					<p><strong>EntradaId:</strong> @EntradaHuacal.IdEntrada</p>
 					<p><strong>Nombre:</strong> @EntradaHuacal.NombreCliente</p>
 					<p><strong>Cantidad:</strong> @EntradaHuacal.Cantidad</p>
-					<p><strong>Precio:</strong> @EntradaHuacal.Precio</p>
+					<p><strong>Precio:</strong> @EntradaHuacal.Importe</p>
 					<p><strong>Fecha:</strong> @EntradaHuacal.Fecha.ToString("dd/MM/yyyy")</p>
 				</div>
 				<div class="modal-footer">

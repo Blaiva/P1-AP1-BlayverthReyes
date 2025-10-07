@@ -41,13 +41,13 @@
 
 				<div class="mb-3">
 					<label class="form-label"><strong>Precio</strong></label>
-					<InputNumber class="form-control" @bind-Value="EntradaHuacal.Precio" />
-					<ValidationMessage For="@(() => EntradaHuacal.Precio)" />
+					<InputNumber class="form-control" @bind-Value="EntradaHuacal.Importe" />
+					<ValidationMessage For="@(() => EntradaHuacal.Importe)" />
 				</div>
 
 				<div class="mb-3">
 					<label class="form-label"><strong>Importe</strong></label>
-					<input type="number" class="form-control" value="@(EntradaHuacal.Cantidad* EntradaHuacal.Precio)" readonly />
+					<input type="number" class="form-control" value="@(EntradaHuacal.Cantidad* EntradaHuacal.Importe)" readonly />
 				</div>
 			</div>
 

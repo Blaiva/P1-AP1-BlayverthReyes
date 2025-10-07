@@ -1,4 +1,5 @@
 ﻿using BlazorBootstrap;
+using Microsoft.AspNetCore.Components;
 
 namespace P1_AP1_BlayverthReyes.Extensors;
 
@@ -10,7 +11,7 @@ public static class ToastServiceExtensions
         {
             Type = toastType,
             Title = title,
-            Message = customMessage ?? $"A las {DateTime.Now.ToString("hh:mm tt")}"
+            Message = customMessage,
         };
         toastService.Notify(message);
         return message;

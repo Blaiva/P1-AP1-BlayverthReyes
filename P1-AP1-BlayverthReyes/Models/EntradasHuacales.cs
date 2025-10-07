@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace P1_AP1_BlayverthReyes.Models;
 
@@ -19,6 +20,9 @@ public class EntradasHuacales
     public int Cantidad { get; set; }
 
     [Required(ErrorMessage = "El precio de los huacales es requerido")]
-    [Range(0.01, int.MaxValue, ErrorMessage = "El precio de los huacales debe ser mayor que cero")]
-    public double Precio { get; set; }
+    [Range(0.01, int.MaxValue, ErrorMessage = "El importe debe ser mayor que cero")]
+    public double Importe { get; set; }
+
+    [InverseProperty("EntradaHuacal")]
+    public virtual ICollection<EntradasHuacalesDetalle> EntradasHuacalesDetalle { get; set; } = new List<EntradasHuacalesDetalle>();
 }
