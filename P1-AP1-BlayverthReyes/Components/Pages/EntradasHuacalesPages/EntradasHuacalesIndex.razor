@@ -57,7 +57,7 @@
 						<option value="" selected disabled>Elige una opci&oacute;n</option>
 						<option value="Cliente">Cliente</option>
 						<option value="Cantidad">Cantidad</option>
-						<option value="Precio">Precio</option>
+						<option value="Importe">Importe</option>
 					</InputSelect>
 				</div>
 
@@ -138,7 +138,7 @@
 				ListaEntradas = await entradasHuacalesService.Listar(e => e.NombreCliente.ToLower().Contains(ValorFiltro.Trim().ToLower()));
 			else if (Filtro == "Cantidad")
 				ListaEntradas = await entradasHuacalesService.Listar(e => e.Cantidad.ToString().Contains(ValorFiltro.Trim()));
-			else if (Filtro == "Precio")
+			else if (Filtro == "Importe")
 				ListaEntradas = await entradasHuacalesService.Listar(e => e.Importe.ToString().Contains(ValorFiltro.Trim()));
 
 			if(FechaDesde.HasValue && FechaHasta.HasValue)

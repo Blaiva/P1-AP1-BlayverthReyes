@@ -168,14 +168,27 @@
 		ListaTipos = await entradasHuacalesService.ListarTipos();
 	}
 
-	private async Task AgregarDetalle()
+	private void AgregarDetalle()
 	{
+		if(Detalle.TipoId < 1)
+		{
+			toastService.ShowWarning("Debes seleccionar el tipo de huacal");
+			return;
+		}
+		else if(Detalle.Cantidad < 1)
+		{
+			toastService.ShowWarning("La cantidad de huacales debe ser mayor que cero");
+			return;
+		}
+		else if (Detalle.Precio < 0.01)
+		{
+			toastService.ShowWarning("El precio de los huacales debe ser mayor que cero");
+			return;
+		}
 		EntradaHuacal.EntradasHuacalesDetalle.Add(Detalle);
 		EntradaHuacal.Cantidad = EntradaHuacal.EntradasHuacalesDetalle.Sum(d => d.Cantidad);
 		EntradaHuacal.Importe = EntradaHuacal.EntradasHuacalesDetalle.Sum(d => d.Cantidad * d.Precio);
-
 		Detalle = new EntradasHuacalesDetalle();
-		await Task.CompletedTask;
 	}
 
 	public void RemoverDetalle(EntradasHuacalesDetalle detalle)
@@ -183,6 +196,7 @@
 		EntradaHuacal.EntradasHuacalesDetalle.Remove(detalle);
 		EntradaHuacal.Cantidad = EntradaHuacal.EntradasHuacalesDetalle.Sum(d => d.Cantidad);
 		EntradaHuacal.Importe = EntradaHuacal.EntradasHuacalesDetalle.Sum(d => d.Cantidad * d.Precio);
+		Detalle = detalle;
 	}
 
 	public async Task Modificar()
