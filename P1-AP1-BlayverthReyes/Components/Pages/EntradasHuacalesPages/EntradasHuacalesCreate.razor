@@ -2,9 +2,12 @@
 
 @inject EntradasHuacalesService entradasHuacalesService
 @inject NavigationManager navigationManager
+@inject ToastService toastService
 @rendermode InteractiveServer
 
 <PageTitle>Registrar Entrada</PageTitle>
+
+<Toasts class="p-3" AutoHide="true" Delay="5000" Placement="ToastsPlacement.TopRight" />
 
 <EditForm Model="EntradaHuacal" OnValidSubmit="Guardar">
 	<DataAnnotationsValidator/>
@@ -30,36 +33,81 @@
 					<ValidationMessage For="@(() => EntradaHuacal.NombreCliente)" />
 				</div>
 
-				<div class="mb-3">
-					<label class="form-label"><strong>Cantidad</strong></label>
-					<InputNumber class="form-control" @bind-Value="EntradaHuacal.Cantidad" />
-					<ValidationMessage For="@(() => EntradaHuacal.Cantidad)"/>
-				</div>
+				<div class="border border-success p-3 mt-3">
+					<h5>Detalles de la Entrada</h5>
 
-				<div class="mb-3">
-					<label class="form-label"><strong>Precio</strong></label>
-					<InputNumber class="form-control" @bind-Value="EntradaHuacal.Precio" />
-					<ValidationMessage For="@(() => EntradaHuacal.Precio)" />
-				</div>
+					<div class="col-auto input-group align-items-center">
 
-				<div class="mb-3">
-					<label class="form-label"><strong>Importe</strong></label>
-					<input type="number" class="form-control" value="@(EntradaHuacal.Cantidad* EntradaHuacal.Precio)" readonly />
-				</div>
+						<label class="col-form-label input-group-text">Tipo:</label>
+						<InputSelect class="form-control form-select" @bind-Value="Detalle.TipoId">
+							<option disabled value="0">Seleccione un tipo de huacal</option>
+							@foreach(var tipo in ListaTipos)
+							{
+								<option value="@tipo.TipoId">@tipo.Descripcion - @tipo.Existencia</option>
+							}
+						</InputSelect>
 
-				@if (!string.IsNullOrEmpty(AlertMessage))
-				{
-					<div class="alert alert-@AlertType alert-dismissible fade show" role="alert">
-						<div>@AlertMessage</div>
+						<label class="col-form-label input-group-text">Cantidad:</label>
+						<InputNumber class="form-control" id="quantity-input" @bind-Value="Detalle.Cantidad" />
+						
+						<label class="col-form-label input-group-text">Precio:</label>
+						<InputNumber class="form-control" id="quantity-input" @bind-Value="Detalle.Precio" />
+
+						<button type="button" class="btn btn-outline-success" @onclick="AgregarDetalle"><span class="bi bi-plus"/> Agregar</button>
 					</div>
-				}
+
+					<table class="table table-light">
+						<thead class="table table-striped table-bordered">
+							<tr class="text-center">
+								<th>Tipo</th>
+								<th>Cantidad</th>
+								<th>Precio</th>
+								<th>Importe</th>
+								<th>Remover</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach(var detalle in EntradaHuacal.EntradasHuacalesDetalle)
+							{
+								<tr class="text-center">
+									<td>@ListaTipos.FirstOrDefault(t => t.TipoId == detalle.TipoId)?.Descripcion</td>
+									<td>@detalle.Cantidad</td>
+									<td>RD$@Math.Round(detalle.Precio, 2)</td>
+									<td>RD$@Math.Round(detalle.Cantidad*detalle.Precio)</td>
+									<td>
+										<button type="button" class="btn btn-outline-danger" @onclick="() => RemoverDetalle(detalle)"><span class="bi bi-trash"/></button>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+					<hr/>
+				</div>
+
+				<div class="row">
+					<div class="col-3 offset-6">
+						<div class="mb-3">
+							<label class="form-label"><strong>Cantidad</strong></label>
+							<label class="form-control text-end"><strong>@EntradaHuacal.Cantidad</strong></label> 
+							<ValidationMessage For="@(() => EntradaHuacal.Cantidad)"/>
+						</div>
+					</div>
+
+					<div class="col-3">
+						<div class="mb-3">
+							<label class="form-label"><strong>Importe</strong></label>
+							<label class="form-control text-end"><strong>RD$@Math.Round(EntradaHuacal.Importe, 2)</strong></label>
+							<ValidationMessage For="@(() => EntradaHuacal.Importe)" />
+						</div>
+					</div>
+				</div>
 			</div>
 
 			@*Footer*@
 			<div class="card-footer text-center">
 				<div class="btn-group">
 					<a href="/index" class="btn btn-outline-secondary"><span class="bi bi-arrow-bar-left"/> Volver</a>
-					@if(AlertType != "success")
+					@if(!creado)
 					{
 						<button type="submit" class="btn btn-outline-success"><span class="bi bi-check-circle" /> Guardar</button>
 					}
@@ -71,26 +119,59 @@
 
 @code {
 	public EntradasHuacales EntradaHuacal { get; set; } = new EntradasHuacales();
-	public string AlertMessage { get; set; }
-	public string AlertType { get; set; }
+	public EntradasHuacalesDetalle Detalle = new();
+	public List<TiposHuacales> ListaTipos { get; set; } = [];
+	public bool creado { get; set; } = false;
 
 	protected override async Task OnInitializedAsync()
 	{
 		EntradaHuacal.Fecha = DateTime.Now;
+		ListaTipos = await entradasHuacalesService.ListarTipos();
+	}
+
+	private void AgregarDetalle()
+	{
+		if (Detalle.TipoId < 1)
+		{
+			toastService.ShowWarning("Debes seleccionar el tipo de huacal");
+			return;
+		}
+		else if (Detalle.Cantidad < 1)
+		{
+			toastService.ShowWarning("La cantidad de huacales debe ser mayor que cero");
+			return;
+		}
+		else if (Detalle.Precio < 0.01)
+		{
+			toastService.ShowWarning("El precio de los huacales debe ser mayor que cero");
+			return;
+		}
+		EntradaHuacal.EntradasHuacalesDetalle.Add(Detalle);
+		EntradaHuacal.Cantidad = EntradaHuacal.EntradasHuacalesDetalle.Sum(d => d.Cantidad);
+		EntradaHuacal.Importe = EntradaHuacal.EntradasHuacalesDetalle.Sum(d => d.Cantidad * d.Precio);
+		Detalle = new EntradasHuacalesDetalle();
+	}
+
+	public void RemoverDetalle(EntradasHuacalesDetalle detalle)
+	{
+		EntradaHuacal.EntradasHuacalesDetalle.Remove(detalle);
+		EntradaHuacal.Cantidad = EntradaHuacal.EntradasHuacalesDetalle.Sum(d => d.Cantidad);
+		EntradaHuacal.Importe = EntradaHuacal.EntradasHuacalesDetalle.Sum(d => d.Cantidad * d.Precio);
+		Detalle = detalle;
 	}
 
 	public async Task Guardar()
 	{
-		var creado = await entradasHuacalesService.Guardar(EntradaHuacal);
+		creado = await entradasHuacalesService.Guardar(EntradaHuacal);
 		if (creado)
 		{
-			AlertMessage = "Entrada creada correctamente.";
-			AlertType = "success";
+			toastService.ShowSuccess("Entrada registrada correctamente");
 		}
 		else
 		{
-			AlertMessage = "Error al crear la Entrada.";
-			AlertType = "danger";
+			toastService.ShowError("No se pudo registrar la entrada");
 		}
 	}
+
+
 }

@@ -2,6 +2,8 @@
 
 @inject EntradasHuacalesService entradasHuacalesService
 @inject NavigationManager navigationManager
+@inject ToastService toastService
+
 @rendermode InteractiveServer
 
 <PageTitle>Entrada de Huacales</PageTitle>
@@ -55,7 +57,7 @@
 						<option value="" selected disabled>Elige una opci&oacute;n</option>
 						<option value="Cliente">Cliente</option>
 						<option value="Cantidad">Cantidad</option>
-						<option value="Precio">Precio</option>
+						<option value="Importe">Importe</option>
 					</InputSelect>
 				</div>
 
@@ -81,7 +83,6 @@
 						<th>Fecha</th>
 						<th>Cliente</th>
 						<th>Cantidad</th>
-						<th>Precio</th>
 						<th>Importe</th>
 						<th>Opciones</th>
 					</tr>
@@ -95,8 +96,7 @@
 							<td>@entrada.Fecha.ToString("dd/MM/yyyy")</td>
 							<td>@entrada.NombreCliente</td>
 							<td>@entrada.Cantidad</td>
-							<td>RD$@Math.Round(entrada.Precio, 2)</td>
-							<td>RD$@Math.Round(entrada.Precio*entrada.Cantidad, 2)</td>
+							<td>RD$@Math.Round(entrada.Importe, 2)</td>
 
 							<td>
 								<a href="/edit/@entrada.IdEntrada" class="btn btn-outline-primary"><span class="bi bi-pencil"/></a>
@@ -111,7 +111,7 @@
 		<div class="card-footer">
 			<div class="text-end">
 				<label class="px-2"><strong>Cantidad: </strong>@ListaEntradas.Sum(e => e.Cantidad)</label>
-				<label><strong>Total: </strong>RD$@Math.Round(ListaEntradas.Sum(e => e.Cantidad * e.Precio), 2)</label>
+				<label><strong>Total: </strong>RD$@Math.Round(ListaEntradas.Sum(e => e.Importe), 2)</label>
 			</div>
 		</div>
 	</div>
@@ -138,8 +138,8 @@
 				ListaEntradas = await entradasHuacalesService.Listar(e => e.NombreCliente.ToLower().Contains(ValorFiltro.Trim().ToLower()));
 			else if (Filtro == "Cantidad")
 				ListaEntradas = await entradasHuacalesService.Listar(e => e.Cantidad.ToString().Contains(ValorFiltro.Trim()));
-			else if (Filtro == "Precio")
-				ListaEntradas = await entradasHuacalesService.Listar(e => e.Precio.ToString().Contains(ValorFiltro.Trim()));
+			else if (Filtro == "Importe")
+				ListaEntradas = await entradasHuacalesService.Listar(e => e.Importe.ToString().Contains(ValorFiltro.Trim()));
 
 			if(FechaDesde.HasValue && FechaHasta.HasValue)
 				ListaEntradas = ListaEntradas.Where(e => e.Fecha >= FechaDesde && e.Fecha <= FechaHasta).ToList();
