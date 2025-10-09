@@ -23,6 +23,6 @@ public class EntradasHuacales
     [Range(0.01, int.MaxValue, ErrorMessage = "El importe debe ser mayor que cero")]
     public double Importe { get; set; }
 
-    [InverseProperty("EntradaHuacal")]
+    [ForeignKey("IdEntrada")]
     public virtual ICollection<EntradasHuacalesDetalle> EntradasHuacalesDetalle { get; set; } = new List<EntradasHuacalesDetalle>();
 }

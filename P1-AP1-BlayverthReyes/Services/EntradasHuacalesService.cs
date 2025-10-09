@@ -17,13 +17,14 @@ public class EntradasHuacalesService(IDbContextFactory<Contexto> DbFactory)
     public async Task AfectarExistencia(EntradasHuacalesDetalle[] detalle, TipoOperacion tipoOperacion)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        foreach(var item  in detalle)
+        foreach(var item in detalle)
         {
             var tipoHuacal = await contexto.TiposHuacales.SingleAsync(t => t.TipoId == item.TipoId);
             if (tipoOperacion == TipoOperacion.Suma)
                 tipoHuacal.Existencia += item.Cantidad;
             else
                 tipoHuacal.Existencia -= item.Cantidad;
+            await contexto.SaveChangesAsync();
         }
     }
 
@@ -38,11 +39,19 @@ public class EntradasHuacalesService(IDbContextFactory<Contexto> DbFactory)
     public async Task<bool> Modificar(EntradasHuacales entradaHuacal)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
+        var original = await contexto.EntradasHuacales
+            .Include(e => e.EntradasHuacalesDetalle)
+            .AsNoTracking()
+            .SingleOrDefaultAsync(e => e.IdEntrada == entradaHuacal.IdEntrada);
 
-        var entradaOriginal = await Buscar(entradaHuacal.IdEntrada);
-        await AfectarExistencia(entradaOriginal.EntradasHuacalesDetalle.ToArray(), TipoOperacion.Resta);
+        if (original == null) return false;
 
-        contexto.EntradasHuacales.Update(entradaHuacal);
+        await AfectarExistencia(original.EntradasHuacalesDetalle.ToArray(), TipoOperacion.Resta);
+
+        contexto.EntradasHuacalesDetalles.RemoveRange(original.EntradasHuacalesDetalle);
+
+        contexto.Update(entradaHuacal);
+
         await AfectarExistencia(entradaHuacal.EntradasHuacalesDetalle.ToArray(), TipoOperacion.Suma);
 
         return await contexto.SaveChangesAsync() > 0;
@@ -77,6 +86,12 @@ public class EntradasHuacalesService(IDbContextFactory<Contexto> DbFactory)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
         return await contexto.EntradasHuacales.Include(e => e.EntradasHuacalesDetalle).Where(criterio).AsNoTracking().ToListAsync();
+    }
+
+    public async Task<List<TiposHuacales>> ListarTipos()
+    {
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        return await contexto.TiposHuacales.Where(t => t.TipoId > 0).AsNoTracking().ToListAsync();
     }
 }
 public enum TipoOperacion

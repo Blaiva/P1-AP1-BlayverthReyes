@@ -11,8 +11,8 @@ using P1_AP1_BlayverthReyes.DAL;
 namespace P1_AP1_BlayverthReyes.Migrations
 {
     [DbContext(typeof(Contexto))]
-    [Migration("20251008144239_Quinta")]
-    partial class Quinta
+    [Migration("20251009023739_Inicial")]
+    partial class Inicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -57,16 +57,18 @@ namespace P1_AP1_BlayverthReyes.Migrations
                     b.Property<int>("EntradaId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Precio")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("IdEntrada")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<double>("Precio")
+                        .HasColumnType("REAL");
 
                     b.Property<int>("TipoId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("DetalleId");
 
-                    b.HasIndex("EntradaId");
+                    b.HasIndex("IdEntrada");
 
                     b.ToTable("EntradasHuacalesDetalles");
                 });
@@ -130,13 +132,9 @@ namespace P1_AP1_BlayverthReyes.Migrations
 
             modelBuilder.Entity("P1_AP1_BlayverthReyes.Models.EntradasHuacalesDetalle", b =>
                 {
-                    b.HasOne("P1_AP1_BlayverthReyes.Models.EntradasHuacales", "EntradaHuacal")
+                    b.HasOne("P1_AP1_BlayverthReyes.Models.EntradasHuacales", null)
                         .WithMany("EntradasHuacalesDetalle")
-                        .HasForeignKey("EntradaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("EntradaHuacal");
+                        .HasForeignKey("IdEntrada");
                 });
 
             modelBuilder.Entity("P1_AP1_BlayverthReyes.Models.EntradasHuacales", b =>
